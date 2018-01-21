@@ -1,0 +1,51 @@
+<configuration>
+    <appender name="JavateamCmsBackendLogFile"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>log/javateam-cms-backend/javateam-cms-backend.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>log/javateam-cms-backend/javateam-cms-backend.log.%i.log.zip</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>10</maxIndex>
+        </rollingPolicy>
+
+        <triggeringPolicy
+                class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>10MB</maxFileSize>
+        </triggeringPolicy>
+        <encoder>
+            <pattern>%d{yyyy/MM/dd HH:mm:ss.SSS} [%thread] %-5level %logger{26} - %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <appender name="SpringLogFile"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>log/spring/spring.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>log/spring/spring.log.%i.log.zip</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>10</maxIndex>
+        </rollingPolicy>
+        <triggeringPolicy
+                class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>10MB</maxFileSize>
+        </triggeringPolicy>
+        <encoder>
+            <pattern>%d{yyyy/MM/dd HH:mm:ss.SSS} [%thread] %-5level %logger{26} - %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy/MM/dd HH:mm:ss.SSS} [%thread] %-5level %logger{26} - %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.ntq.javateam.cms.backend" level="debug">
+        <appender-ref ref="JavateamCmsBackendLogFile"/>
+        <appender-ref ref="STDOUT"/>
+    </logger>
+
+</configuration>

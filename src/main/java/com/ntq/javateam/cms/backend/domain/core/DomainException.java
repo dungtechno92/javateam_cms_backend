@@ -61,7 +61,9 @@ public class DomainException extends RuntimeException {
 
         GENERAL(1),
 
-        USER(2);
+        USER(2),
+
+        MEMBER(3);
 
         private int domainCode;
 

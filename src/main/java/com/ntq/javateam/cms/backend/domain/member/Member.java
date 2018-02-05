@@ -1,6 +1,7 @@
 package com.ntq.javateam.cms.backend.domain.member;
 
 import com.ntq.javateam.cms.backend.domain.core.Domain;
+import com.ntq.javateam.cms.backend.web.member.MemberRequest;
 import org.hibernate.validator.constraints.NotBlank;
 
 import javax.persistence.Entity;
@@ -60,5 +61,16 @@ public class Member extends Domain {
 
     public void setLeftDate(Date leftDate) {
         this.leftDate = leftDate;
+    }
+
+    public Member() {
+    }
+
+    public Member(MemberRequest memberRequest) {
+        this.email = memberRequest.getEmail();
+        this.phoneNumber = memberRequest.getPhoneNumber();
+        this.name = memberRequest.getName();
+        this.joinDate = memberRequest.getJoinDate();
+        this.leftDate = memberRequest.getLeftDate();
     }
 }

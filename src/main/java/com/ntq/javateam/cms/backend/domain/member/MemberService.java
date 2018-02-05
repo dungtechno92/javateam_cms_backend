@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class MemberService extends DomainService {
 
     @Autowired
@@ -28,13 +29,39 @@ public class MemberService extends DomainService {
         return members.stream().map(member -> new MemberResponse(member)).collect(Collectors.toList());
     }
 
-    @Transactional
+    public MemberResponse getOne(Long id) {
+        Member member = memberDAO.findOne(id);
+        ensureMemberExisting(member, id);
+        return new MemberResponse(member);
+    }
+
     public MemberResponse create(MemberRequest memberRequest) {
-        Member member = formRequest(memberRequest);
+        Member member = new Member(memberRequest);
         member.createdBy("system");
         validateMember(member);
         Member memberSaved = memberDAO.create(member);
         return new MemberResponse(memberSaved);
+    }
+
+    public MemberResponse update(MemberRequest memberRequest, Long id) {
+        Member memberInDb = memberDAO.findOne(id);
+        ensureMemberExisting(memberInDb, id);
+
+        memberInDb.setPhoneNumber(memberRequest.getPhoneNumber());
+        memberInDb.setName(memberRequest.getName());
+        memberInDb.setEmail(memberRequest.getEmail());
+        memberInDb.setJoinDate(memberRequest.getJoinDate());
+        memberInDb.setLeftDate(memberRequest.getLeftDate());
+        memberInDb.updatedBy("system");
+        validateMember(memberInDb);
+        Member memberSaved = memberDAO.update(memberInDb);
+        return new MemberResponse(memberSaved);
+    }
+
+    public void delete(Long id) {
+        Member member = memberDAO.findOne(id);
+        ensureMemberExisting(member, id);
+        memberDAO.delete(id);
     }
 
     private void validateMember(Member member) {
@@ -44,14 +71,9 @@ public class MemberService extends DomainService {
         }
     }
 
-    private Member formRequest(MemberRequest memberRequest) {
-        Member member = new Member();
-        member.setEmail(memberRequest.getEmail());
-        member.setPhoneNumber(memberRequest.getPhoneNumber());
-        member.setName(memberRequest.getName());
-        member.setJoinDate(memberRequest.getJoinDate());
-        member.setLeftDate(memberRequest.getLeftDate());
-
-        return member;
+    private void ensureMemberExisting(Member member, Long id) {
+        if (member == null) {
+            throw new MemberException(MemberException.MEMBER_NOT_EXISTING, String.format("Member with id %s not existing in database.", id));
+        }
     }
 }

@@ -6,10 +6,7 @@ import com.ntq.javateam.cms.backend.web.support.ResponseSupport;
 import com.ntq.javateam.cms.backend.web.support.RestApiV1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -25,8 +22,24 @@ public class MemberController implements ResponseSupport {
         return ok(memberService.getAll(), response, HttpStatus.OK);
     }
 
+    @GetMapping(path = "/members/{id}")
+    public Response getOne(HttpServletResponse response, @PathVariable Long id ) {
+        return ok(memberService.getOne(id), response, HttpStatus.OK);
+    }
+
+    @DeleteMapping(path = "/members/{id}")
+    public void delete(HttpServletResponse response, @PathVariable Long id ) {
+        memberService.delete(id);
+        deletedOk(response);
+    }
+
     @PostMapping(path = "/members")
-    public Response create(@RequestBody MemberRequest memberRequest, HttpServletResponse response) {
+    public Response create(HttpServletResponse response, @RequestBody MemberRequest memberRequest) {
         return ok(memberService.create(memberRequest), response, HttpStatus.OK);
+    }
+
+    @PutMapping(path = "/members/{id}")
+    public Response create(HttpServletResponse response, @RequestBody MemberRequest memberRequest, @PathVariable Long id) {
+        return ok(memberService.update(memberRequest, id), response, HttpStatus.OK);
     }
 }

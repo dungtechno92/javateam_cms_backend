@@ -27,6 +27,9 @@ public class MemberDAO extends DomainDAO implements IMemberDAO {
         try {
             Criteria criteria = session.createCriteria(Member.class);
             members = criteria.list();
+        } catch (Exception e) {
+            LOG.warn("Get all members encountered an error: ", e);
+            throw e;
         } finally {
             session.close();
         }
@@ -35,20 +38,79 @@ public class MemberDAO extends DomainDAO implements IMemberDAO {
     }
 
     @Override
-    public Member create(Member member) {
+    public Member findOne(Long id) {
+        if (id == null || id <= 0) {
+            throw new MemberException(MemberException.INVALID_MEMBER_ID, String.format("Member id % was invalid.", id));
+        }
+
         Session session = hibernateFactory.openSession();
-        Transaction transaction = null;
+        Member member;
         try {
-            transaction = session.beginTransaction();
-            session.persist(member);
-            transaction.commit();
+            member = session.get(Member.class, id);
         } catch (Exception e) {
-            transaction.rollback();
+            String errorMessage = String.format("Get a member with identify %s encountered an error: ", id);
+            LOG.warn(errorMessage, e);
             throw e;
         } finally {
             session.close();
         }
 
         return member;
+    }
+
+    @Override
+    public Member create(Member member) {
+        Session session = hibernateFactory.openSession();
+        Transaction transaction = null;
+        try {
+            transaction = session.beginTransaction();
+            session.save(member);
+            transaction.commit();
+        } catch (Exception e) {
+            transaction.rollback();
+            LOG.warn("Save a member encountered an error: ", e);
+            throw e;
+        } finally {
+            session.close();
+        }
+
+        return member;
+    }
+
+    @Override
+    public Member update(Member member) {
+        Session session = hibernateFactory.openSession();
+        Transaction transaction = null;
+        try {
+            transaction = session.beginTransaction();
+            session.merge(member);
+            transaction.commit();
+        } catch (Exception e) {
+            transaction.rollback();
+            LOG.warn("Save a member encountered an error: ", e);
+            throw e;
+        } finally {
+            session.close();
+        }
+
+        return member;
+    }
+
+    @Override
+    public void delete(Long id) {
+        Session session = hibernateFactory.openSession();
+        Transaction transaction = null;
+        try {
+            transaction = session.beginTransaction();
+            Member member = session.get(Member.class, id);
+            session.delete(member);
+            transaction.commit();
+        } catch (Exception e) {
+            transaction.rollback();
+            LOG.warn("Delete a member with id  encountered an error: ", e);
+            throw e;
+        } finally {
+            session.close();
+        }
     }
 }
